@@ -113,6 +113,33 @@ Start `katali-hybrid-gui.exe`, select the `.khyb` file, and send a message. The 
 
 ## Current status
 
+## Three-coder experiment
+
+The current experimental coding package adds a three-stage sequential pipeline:
+
+```text
+Qwen2.5-Coder 1.5B Q4_K_M -> CodeGemma 2B Q4_K_M -> Granite 3B Code Q4_K_M
+```
+
+Qwen drafts code, CodeGemma reviews it, and Granite performs the final review.
+This is an integration pipeline, not a router or a mathematical weight merge.
+The tested package is hosted on Hugging Face:
+
+[Download the KATALI Code Hybrid package](https://huggingface.co/katalidevai/katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4)
+
+Run it with the standalone runtime:
+
+```powershell
+.\katali-hybrid.exe `
+  C:\models\katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4.khyb `
+  "Write a safe C function that checks integer overflow. Return only code." `
+  --max 64
+```
+
+The GUI can select the `.khyb` file from the normal models directory. Use
+short controlled prompts for the first tests because the final Granite model
+has a 2K context window.
+
 The current prototype demonstrates:
 
 - One-file hybrid packaging.
