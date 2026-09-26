@@ -16,6 +16,7 @@ The embedded models remain Q4_K_M GGUF models. The `.khyb` file is not a standal
 ## Included files
 
 - `katali-hybrid.exe` - Hybrid inference runtime.
+- `katali-hybrid-api.exe` - Loopback HTTP API wrapper.
 - `katali-hybrid-gui.exe` - Compact Windows chat interface build.
 - `pack-khyb.exe` - Creates a `.khyb` package from two GGUF files.
 - `katali_cuda.dll` - KATALI CUDA runtime dependency.
@@ -169,3 +170,23 @@ The long-term goal is a practical, measurable, and lightweight hybrid model runt
 ---
 
 **Developed by: Joan Apita**
+
+## Local HTTP API
+
+The binary release includes `katali-hybrid-api.exe`. Start it with a packaged
+model:
+
+```powershell
+.\katali-hybrid-api.exe C:\models\katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4.khyb --port 8080 --max 96
+```
+
+It binds to `127.0.0.1` and supports `GET /health`, `POST /generate`, and
+OpenAI-compatible `POST /v1/chat/completions`:
+
+```powershell
+$body = @{ prompt = 'Write a Rust Hello World program.'; max_tokens = 64 } | ConvertTo-Json
+Invoke-RestMethod http://127.0.0.1:8080/v1/chat/completions -Method Post -ContentType 'application/json' -Body $body
+```
+
+The initial API starts the runtime for each request. Persistent model residency
+is planned for higher throughput.
