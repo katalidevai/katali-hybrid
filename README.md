@@ -16,7 +16,7 @@ The embedded models remain Q4_K_M GGUF models. The `.khyb` file is not a standal
 ## Included files
 
 - `katali-hybrid.exe` - Hybrid inference runtime.
-- `katali-hybrid-gui.exe` - Self-contained Windows chat interface.
+- `katali-hybrid-gui.exe` - Compact Windows chat interface build.
 - `pack-khyb.exe` - Creates a `.khyb` package from two GGUF files.
 - `katali_cuda.dll` - KATALI CUDA runtime dependency.
 - `cudart64_13.dll` - CUDA runtime dependency.
@@ -91,7 +91,7 @@ katali_cuda.dll
 cudart64_13.dll
 ```
 
-Start `katali-hybrid-gui.exe`, select the `.khyb` file, and send a message. The GUI is self-contained and does not require a separate .NET installation.
+Start `katali-hybrid-gui.exe`, select the `.khyb` file, and send a message. The compact GitHub build requires the .NET 9 Desktop Runtime. A full self-contained GUI build is available from the Hugging Face repository.
 
 ## Current status
 
