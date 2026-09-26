@@ -98,3 +98,6 @@ Planned research includes:
 
 The long-term goal is a practical, measurable, and lightweight hybrid model runtime: one local package, two complementary small models, and a clear speed-versus-quality benchmark.
 
+---
+
+**Developed by: Joan Apita**
