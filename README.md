@@ -29,7 +29,12 @@ The complete Qwen3 + Llama model package is hosted separately on Hugging Face:
 
 [Download KATALI Hybrid Qwen3 0.6B + Llama 3.2 1B](https://huggingface.co/katalidevai/katali-hybrid-qwen06b-llama1b-q4)
 
-Download `katali-hybrid-qwen06b-llama1b-q4.khyb` from that page. Users do not need to download the two original GGUF files separately.
+Direct downloads:
+
+- [Download the combined `.khyb` model](https://huggingface.co/katalidevai/katali-hybrid-qwen06b-llama1b-q4/resolve/main/katali-hybrid-qwen06b-llama1b-q4.khyb)
+- [Download the self-contained Windows GUI](https://huggingface.co/katalidevai/katali-hybrid-qwen06b-llama1b-q4/resolve/main/katali-hybrid-gui.exe)
+
+Users do not need to download the two original GGUF files separately.
 
 ## Requirements
 
