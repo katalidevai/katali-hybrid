@@ -188,5 +188,6 @@ $body = @{ prompt = 'Write a Rust Hello World program.'; max_tokens = 64 } | Con
 Invoke-RestMethod http://127.0.0.1:8080/v1/chat/completions -Method Post -ContentType 'application/json' -Body $body
 ```
 
-The initial API starts the runtime for each request. Persistent model residency
-is planned for higher throughput.
+The API starts one resident hybrid runtime and reuses the loaded models for
+subsequent requests. Requests are processed sequentially for deterministic
+small-model operation.
