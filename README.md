@@ -36,6 +36,19 @@ Direct downloads:
 
 Users do not need to download the two original GGUF files separately.
 
+## Larger experimental package
+
+For improved factual and reasoning quality, a larger experimental pair is also available:
+
+```text
+Qwen3 1.7B Q4_K_M + Llama 3.2 3B Instruct Q4_K_M
+```
+
+- [Download the Qwen3 1.7B + Llama 3B `.khyb` package](https://huggingface.co/katalidevai/katali-hybrid-qwen17b-llama3b-q4/resolve/main/katali-hybrid-qwen17b-llama3b-q4.khyb)
+- [Open the larger package repository](https://huggingface.co/katalidevai/katali-hybrid-qwen17b-llama3b-q4)
+
+This package is approximately 3.3 GB and is currently about 1.9x slower in cold-start testing than the original pair, but it passed the initial factual, coding, reasoning, and instruction tests more reliably.
+
 ## Requirements
 
 - Windows 10 or newer.
