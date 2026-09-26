@@ -171,23 +171,178 @@ The long-term goal is a practical, measurable, and lightweight hybrid model runt
 
 **Developed by: Joan Apita**
 
-## Local HTTP API
+## Complete HTTP API tutorial
 
-The binary release includes `katali-hybrid-api.exe`. Start it with a packaged
-model:
+`katali-hybrid-api.exe` is a small local HTTP server for applications that
+want to call the KATALI Hybrid runtime. It loads one `.khyb` package once and
+keeps all models resident for subsequent requests.
 
-```powershell
-.\katali-hybrid-api.exe C:\models\katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4.khyb --port 8080 --max 96
+### 1. Install the files
+
+Download the binary release from this GitHub repository and place these files
+in one folder:
+
+```text
+katali-hybrid-api.exe
+katali-hybrid.exe
+katali_cuda.dll          (only if included by your build)
+cudart64_13.dll          (only if included by your build)
 ```
 
-It binds to `127.0.0.1` and supports `GET /health`, `POST /generate`, and
-OpenAI-compatible `POST /v1/chat/completions`:
+Download the combined coding model from Hugging Face:
 
-```powershell
-$body = @{ prompt = 'Write a Rust Hello World program.'; max_tokens = 64 } | ConvertTo-Json
-Invoke-RestMethod http://127.0.0.1:8080/v1/chat/completions -Method Post -ContentType 'application/json' -Body $body
+[KATALI Code Hybrid model](https://huggingface.co/katalidevai/katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4)
+
+Save the `.khyb` file, for example:
+
+```text
+C:\models\katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4.khyb
 ```
 
-The API starts one resident hybrid runtime and reuses the loaded models for
-subsequent requests. Requests are processed sequentially for deterministic
-small-model operation.
+The original GGUF files are not needed when using the combined package.
+
+### 2. Start the API
+
+Open PowerShell in the folder containing the executables:
+
+```powershell
+.\katali-hybrid-api.exe `
+  C:\models\katali-code-hybrid-qwen15b-codegemma2b-granite3b-q4.khyb `
+  --port 8080 `
+  --max 96
+```
+
+Options:
+
+```text
+--port N     HTTP port; default is 8080
+--max N      Default maximum generated tokens; default is 96
+```
+
+Keep this PowerShell window open while using the API. The server listens only
+on `127.0.0.1`, so it is not exposed to other computers by default.
+
+### 3. Check that the API is running
+
+In a second PowerShell window:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8080/health
+```
+
+Expected response:
+
+```json
+{"status":"ok","runtime":"katali-hybrid"}
+```
+
+### 4. Generate with the simple endpoint
+
+`POST /generate` accepts either `prompt` or `content`:
+
+```powershell
+$body = @{
+  prompt = "Write a Rust Hello World program. Return only code."
+  max_tokens = 64
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  http://127.0.0.1:8080/generate `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+### 5. Use the OpenAI-compatible endpoint
+
+`POST /v1/chat/completions` accepts the familiar `messages` format:
+
+```powershell
+$body = @{
+  model = "katali-code-hybrid"
+  messages = @(
+    @{ role = "user"; content = "Write a C function that checks integer overflow. Return only code." }
+  )
+  max_tokens = 96
+} | ConvertTo-Json -Depth 5
+
+$result = Invoke-RestMethod `
+  http://127.0.0.1:8080/v1/chat/completions `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body
+
+$result.choices[0].message.content
+```
+
+The server also accepts a direct `prompt` field on this endpoint, which is
+useful for small scripts.
+
+### 6. Call it with curl
+
+PowerShell:
+
+```powershell
+curl.exe http://127.0.0.1:8080/v1/chat/completions `
+  -H "Content-Type: application/json" `
+  -d '{"model":"katali-code-hybrid","messages":[{"role":"user","content":"Write a Rust function that adds two i32 values."}],"max_tokens":64}'
+```
+
+### 7. Call it from Python
+
+The API uses ordinary HTTP and does not require an SDK:
+
+```python
+import requests
+
+response = requests.post(
+    "http://127.0.0.1:8080/v1/chat/completions",
+    json={
+        "model": "katali-code-hybrid",
+        "messages": [
+            {"role": "user", "content": "Write a safe Rust hello-world program."}
+        ],
+        "max_tokens": 96,
+    },
+    timeout=300,
+)
+response.raise_for_status()
+print(response.json()["choices"][0]["message"]["content"])
+```
+
+### 8. Response format
+
+Successful generation returns an OpenAI-style response:
+
+```json
+{
+  "id": "katali-hybrid",
+  "object": "chat.completion",
+  "model": "C:\\models\\model.khyb",
+  "choices": [
+    {
+      "index": 0,
+      "message": {"role": "assistant", "content": "generated text"},
+      "finish_reason": "stop"
+    }
+  ]
+}
+```
+
+### 9. Troubleshooting
+
+- `connection refused`: start `katali-hybrid-api.exe` and check the port.
+- `missing prompt`: include `prompt`, `content`, or a message with `content`.
+- `hybrid runtime failed`: verify the `.khyb` path and keep the runtime DLLs
+  beside the executables.
+- Slow first request: the resident API loads all embedded models before the
+  first generation. Later requests reuse them.
+- Requests are currently processed one at a time. Run separate API processes
+  on different ports if you need isolated parallel experiments.
+
+### 10. Stop the API
+
+Press `Ctrl+C` in the server PowerShell window.
+
+The API is an experimental local code-generation service. It does not provide
+authentication, HTTPS, remote access, streaming, or multi-user scheduling.
