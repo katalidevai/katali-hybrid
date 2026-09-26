@@ -16,11 +16,20 @@ The embedded models remain Q4_K_M GGUF models. The `.khyb` file is not a standal
 ## Included files
 
 - `katali-hybrid.exe` - Hybrid inference runtime.
+- `katali-hybrid-gui.exe` - Self-contained Windows chat interface.
 - `pack-khyb.exe` - Creates a `.khyb` package from two GGUF files.
 - `katali_cuda.dll` - KATALI CUDA runtime dependency.
 - `cudart64_13.dll` - CUDA runtime dependency.
 
 No C source code, headers, build files, or model weights are included in this binary release.
+
+## Download the combined model
+
+The complete Qwen3 + Llama model package is hosted separately on Hugging Face:
+
+[Download KATALI Hybrid Qwen3 0.6B + Llama 3.2 1B](https://huggingface.co/katalidevai/katali-hybrid-qwen06b-llama1b-q4)
+
+Download `katali-hybrid-qwen06b-llama1b-q4.khyb` from that page. Users do not need to download the two original GGUF files separately.
 
 ## Requirements
 
@@ -69,6 +78,20 @@ Start the persistent stdin chat server:
 ```
 
 Enter one prompt per line. The process stays loaded between requests, which avoids paying the model startup cost for every prompt.
+
+## GUI mode
+
+Place these files in one folder:
+
+```text
+katali-hybrid-gui.exe
+katali-hybrid.exe
+katali-hybrid-qwen06b-llama1b-q4.khyb
+katali_cuda.dll
+cudart64_13.dll
+```
+
+Start `katali-hybrid-gui.exe`, select the `.khyb` file, and send a message. The GUI is self-contained and does not require a separate .NET installation.
 
 ## Current status
 
